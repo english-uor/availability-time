@@ -33,8 +33,9 @@
   .splash{position:fixed;inset:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
     z-index:1000;transition:opacity .45s ease, visibility .45s ease;padding:20px;text-align:center;}
   .splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
-  .splash-eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:16px;font-weight:600;}
-  .splash-title{font-family:'Fraunces',serif;font-size:36px;margin:0 0 10px;color:#fff;}
+  .splash-eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:14px;font-weight:600;}
+  .splash-rule{width:36px;height:2px;background:var(--gold);margin:0 auto 18px;border-radius:2px;}
+  .splash-title{font-family:'Fraunces',serif;font-size:29px;line-height:1.3;margin:0 auto 12px;color:#fff;max-width:340px;}
   html[dir="rtl"] .splash-title{font-family:'Vazirmatn',serif;}
   .splash-sub{font-size:14px;color:#C9D0E0;margin:2px 0;}
   .splash-sub.muted{font-size:12.5px;color:#8B96B8;}
@@ -65,6 +66,12 @@
   .btn-full{width:100%;}
   .btn-sm{padding:7px 12px;font-size:13px;}
   .err{color:var(--rust);font-size:13px;margin-top:10px;display:none;}
+  .wait-row{display:none;align-items:center;justify-content:center;gap:9px;margin-top:14px;font-size:13px;color:var(--ink-soft);}
+  .wait-row.show{display:flex;}
+  .mini-dots{display:flex;gap:5px;}
+  .mini-dots span{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:splashPulse 1.1s ease-in-out infinite;}
+  .mini-dots span:nth-child(2){animation-delay:.15s;}
+  .mini-dots span:nth-child(3){animation-delay:.3s;}
 
   .section-title{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px;}
   .hint{font-size:13px;color:var(--ink-soft);margin:0 0 14px;}
@@ -104,6 +111,7 @@
 <div id="splash" class="splash">
   <div>
     <div class="splash-eyebrow" data-i18n="uni">University of Raparin</div>
+    <div class="splash-rule"></div>
     <h1 class="splash-title" data-i18n="splashTitle">Welcome</h1>
     <p class="splash-sub" data-i18n="splashSub">Getting your dashboard ready…</p>
     <div class="splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -132,6 +140,7 @@
       <label for="codeInput" data-i18n="codeLabel">Your code</label>
       <input id="codeInput" type="text" inputmode="numeric" autocomplete="off" data-i18n-ph="codePlaceholder" placeholder="1234">
       <button class="btn btn-primary btn-full" style="margin-top:16px" id="loginBtn" data-i18n="loginBtn">Log in</button>
+      <div class="wait-row" id="loginWaitRow"><div class="mini-dots"><span></span><span></span><span></span></div><span data-i18n="loginWait">Please wait — we're recognizing you and preparing your page…</span></div>
       <p class="err" id="loginErr" data-i18n="invalidCode">That code isn't recognized.</p>
     </div>
   </section>
@@ -189,7 +198,7 @@
 /* ============================================================
    SET THIS ONE LINE — your Apps Script Web App URL (ends /exec)
    ============================================================ */
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxuOuXa2uapR_l0SqWdxJDBNHWagr55pe17uy4G-RgHz3WUOeYLbFsxYtlUUAf3U680Mw/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbylPrlTo5wsneit8T42_-wHE5ziMf2ZpxP19CXY4DRw2OLnkSFpVamwNRr3CsfEUArxCg/exec';
 const splashStart = Date.now();
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -201,9 +210,9 @@ const DAY_LABEL = {
 const T = {
   en: {
     uni:'University of Raparin', appTitle:'Teacher Availability',
-    splashTitle:'Welcome', splashSub:'Getting your dashboard ready…',
+    splashTitle:'Welcome to the English Language Department', splashSub:'Please wait while we get your page ready…',
     loginTitle:'Teacher Login', loginHint:"Enter the unique code you were given.",
-    codeLabel:'Your code', codePlaceholder:'1234', loginBtn:'Log in', invalidCode:"That code isn't recognized.",
+    codeLabel:'Your code', codePlaceholder:'1234', loginBtn:'Log in', loginBtnWait:'Please wait…', loginWait:"Please wait — we're recognizing you and preparing your page…", invalidCode:"That code isn't recognized.",
     dashHint:'Only you can see and edit this page.', logout:'Log out',
     scheduleTitle:'My weekly schedule', scheduleHint:'This repeats every week until you change it. Students see it instantly after you save.',
     saveSchedule:'Save schedule', savedFlash:'Saved.', addTime:'+ Add time', cancel:'Cancel', add:'Add',
@@ -217,9 +226,9 @@ const T = {
   },
   ku: {
     uni:'زانکۆی ڕاپەرین', appTitle:'کاتی بەردەستبوونی مامۆستا',
-    splashTitle:'بەخێربێیت', splashSub:'خشتەکەت ئامادە دەکەین…',
+    splashTitle:'بەخێربێیت بۆ بەشی زمانی ئینگلیزی', splashSub:'تکایە چاوەڕێ بکە تا پەڕەکەت ئامادە دەبێت…',
     loginTitle:'چوونەژوورەوەی مامۆستا', loginHint:'ئەو کۆدە تایبەتەت بنووسە کە پێت دراوە.',
-    codeLabel:'کۆدەکەت', codePlaceholder:'1234', loginBtn:'چوونەژوورەوە', invalidCode:'ئەم کۆدە نەناسراوە.',
+    codeLabel:'کۆدەکەت', codePlaceholder:'1234', loginBtn:'چوونەژوورەوە', loginBtnWait:'چاوەڕێ بکە…', loginWait:'تکایە چاوەڕێ بکە، دەتناسینەوە و پەڕەکەت ئامادە دەکەین…', invalidCode:'ئەم کۆدە نەناسراوە.',
     dashHint:'تەنها تۆ دەتوانیت ئەم پەڕەیە ببینیت و بگۆڕیت.', logout:'دەرچوون',
     scheduleTitle:'خشتەی هەفتانەم', scheduleHint:'ئەمە هەموو هەفتەیەک دووبارە دەبێتەوە تا نەیگۆڕیت. دوای هەڵگرتن دەستبەجێ بۆ خوێندکاران دەردەکەوێت.',
     saveSchedule:'خشتەکە هەڵبگرە', savedFlash:'هەڵگیرا.', addTime:'+ کاتێک زیاد بکە', cancel:'پاشگەزبوونەوە', add:'زیادکردن',
@@ -281,15 +290,20 @@ document.getElementById('codeInput').addEventListener('keydown', function(e){ if
 async function attemptLogin(code, opts){
   opts = opts || {};
   const errEl = document.getElementById('loginErr');
+  const waitRow = document.getElementById('loginWaitRow');
+  const btn = document.getElementById('loginBtn');
   errEl.style.display = 'none';
   if (!code) return false;
-  const btn = document.getElementById('loginBtn');
   btn.disabled = true;
+  if (!opts.silent){
+    btn.textContent = tr('loginBtnWait');
+    waitRow.classList.add('show');
+  }
   try{
     const r = await api('login', { code: code });
     if (r.success){
       me = { id: r.id, nameEn: r.nameEn, nameKu: r.nameKu };
-      await loadMyData();
+      applyMyData(r);
       document.getElementById('loginView').style.display = 'none';
       document.getElementById('dashboardView').style.display = 'block';
       saveCode(code);
@@ -305,17 +319,23 @@ async function attemptLogin(code, opts){
     return false;
   } finally {
     btn.disabled = false;
+    btn.textContent = tr('loginBtn');
+    waitRow.classList.remove('show');
   }
 }
 
-async function loadMyData(){
-  const data = await api('getMyData', { teacherId: me.id });
+function applyMyData(data){
   mySlots = data.slots || [];
   myNotices = data.notices || [];
   document.getElementById('emailInput').value = data.email || '';
   document.getElementById('phoneInput').value = data.phone || '';
   document.getElementById('officeInput').value = data.office || '';
   document.getElementById('previewLink').href = 'student.html?teacher=' + encodeURIComponent(me.id);
+}
+
+async function loadMyData(){
+  const data = await api('getMyData', { teacherId: me.id });
+  applyMyData(data);
 }
 
 document.getElementById('logoutBtn').addEventListener('click', function(){
