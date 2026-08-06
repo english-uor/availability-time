@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ku" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Teacher Availability — Student Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&family=Vazirmatn:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#16213E; --ink-soft:#57628A; --paper:#F5F3EC; --line:#E2DDCE;
+    --card:#FFFFFF; --gold:#B8862E; --gold-soft:#F1E4C2; --forest:#2F6B4F;
+    --forest-soft:#DEEEE5; --rust:#B33A2E; --rust-soft:#F7E1DD; --radius:12px;
+    --shadow:0 1px 2px rgba(22,33,62,.06),0 6px 20px rgba(22,33,62,.07);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.45;}
+  html[dir="rtl"] body,html[dir="rtl"] h1,html[dir="rtl"] h2,html[dir="rtl"] h3,html[dir="rtl"] button,html[dir="rtl"] input,html[dir="rtl"] select{font-family:'Vazirmatn','Inter',sans-serif;}
+  h1,h2,h3{font-family:'Fraunces',serif;margin:0 0 4px;color:var(--ink);}
+  html[dir="rtl"] h1,html[dir="rtl"] h2,html[dir="rtl"] h3{font-family:'Vazirmatn',serif;}
+  .mono{font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums;}
+  a{color:var(--gold);}
+  .wrap{max-width:880px;margin:0 auto;padding:0 16px 64px;}
+  .topbar{border-bottom:1px solid var(--line);background:var(--card);}
+  .topbar-inner{max-width:880px;margin:0 auto;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .brand{display:flex;flex-direction:column;}
+  .brand .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);font-weight:600;}
+  .brand h1{font-size:20px;}
+  #langToggle{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+  #langToggle:hover{border-color:var(--gold);color:var(--gold);}
+  #banner{display:none;background:var(--rust-soft);color:var(--rust);font-size:13px;padding:10px 16px;text-align:center;font-weight:600;}
+
+  .splash{position:fixed;inset:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
+    z-index:1000;transition:opacity .45s ease, visibility .45s ease;padding:20px;text-align:center;}
+  .splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
+  .splash-eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:14px;font-weight:600;}
+  .splash-rule{width:36px;height:2px;background:var(--gold);margin:0 auto 18px;border-radius:2px;}
+  .splash-title{font-family:'Fraunces',serif;font-size:29px;line-height:1.3;margin:0 auto 12px;color:#fff;max-width:340px;}
+  html[dir="rtl"] .splash-title{font-family:'Vazirmatn',serif;}
+  .splash-sub{font-size:14px;color:#C9D0E0;margin:2px 0;}
+  .splash-sub.muted{font-size:12.5px;color:#8B96B8;}
+  .splash-dots{margin-top:24px;display:flex;gap:8px;justify-content:center;}
+  .splash-dots span{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:splashPulse 1.1s ease-in-out infinite;}
+  .splash-dots span:nth-child(2){animation-delay:.15s;}
+  .splash-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes splashPulse{0%,80%,100%{opacity:.25;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+  @media (prefers-reduced-motion: reduce){.splash-dots span{animation:none;opacity:.7;}}
+
+  .avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:15px;flex-shrink:0;font-family:'Fraunces',serif;}
+  html[dir="rtl"] .avatar{font-family:'Vazirmatn',serif;}
+  .avatar-lg{width:58px;height:58px;font-size:21px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-top:20px;}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
+  .controls input[type=text],.controls select{
+    border:1px solid var(--line);border-radius:8px;padding:11px 12px;font-size:15px;font-family:inherit;background:#fff;color:var(--ink);
+  }
+  .search-wrap{position:relative;flex:2;min-width:180px;}
+  #searchInput{width:100%;}
+  #deptFilter{flex:1;min-width:140px;}
+  input:focus,select:focus,button:focus{outline:2px solid var(--gold);outline-offset:1px;}
+  .dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1px solid var(--line);
+    border-radius:8px;box-shadow:var(--shadow);max-height:280px;overflow-y:auto;z-index:20;list-style:none;margin:0;padding:6px;}
+  .dropdown[hidden]{display:none;}
+  .dropdown li{padding:9px 12px;border-radius:6px;cursor:pointer;}
+  .dropdown li:hover,.dropdown li.active{background:var(--gold-soft);}
+  .dropdown .dname{font-weight:600;font-size:14px;color:var(--ink);}
+  .dropdown .dmeta{font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  .toggle-chip{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;background:#fff;user-select:none;}
+  .toggle-chip.on{border-color:var(--forest);color:var(--forest);background:var(--forest-soft);}
+  .toggle-chip input{display:none;}
+
+  #listView .card{padding:0;overflow:hidden;}
+  .list-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .list-row:last-child{border-bottom:none;}
+  .list-row:hover{background:var(--paper);}
+  .list-row .row-text{flex:1;min-width:0;}
+  .list-row .name{font-weight:600;font-size:15px;}
+  .list-row .meta{font-size:13px;color:var(--ink-soft);margin-top:2px;}
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;flex-shrink:0;}
+  .badge-on{background:var(--forest-soft);color:var(--forest);}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--forest);}
+  .empty{text-align:center;color:var(--ink-soft);font-size:14px;padding:40px 20px;}
+
+  .back-btn{border:none;background:transparent;color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;display:inline-flex;align-items:center;gap:6px;}
+  .back-btn:hover{color:var(--gold);}
+  .detail-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .detail-head .name-block{flex:1;min-width:160px;}
+  .detail-head .dept{color:var(--ink-soft);font-size:14px;margin-top:2px;}
+  .notice-banner{background:var(--rust-soft);color:var(--rust);border-radius:8px;padding:12px 14px;margin-top:16px;font-size:14px;}
+  .notice-banner + .notice-banner{margin-top:8px;}
+  .contact-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+  .contact-row a,.contact-row span{font-size:14px;border:1px solid var(--line);border-radius:8px;padding:9px 14px;color:var(--ink);text-decoration:none;background:#fff;}
+  .contact-row a:hover{border-color:var(--gold);color:var(--gold);}
+  .day-block{border-top:1px solid var(--line);padding:16px 0;}
+  .day-block:first-of-type{border-top:none;}
+  .day-name{font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;}
+  .slots{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{background:var(--gold-soft);border-radius:12px;padding:11px 16px;font-size:17px;font-weight:600;}
+  .chip .loc{color:var(--ink-soft);margin-inline-start:8px;font-size:14px;font-weight:500;}
+
+  .table-wrap{overflow-x:auto;margin-top:12px;border-radius:10px;border:1px solid var(--line);}
+  .sched-table{width:100%;border-collapse:collapse;font-size:15.5px;}
+  .sched-table th{text-align:start;font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);
+    background:var(--paper);padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap;}
+  .sched-table td{padding:12px 14px;border-bottom:1px solid rgba(22,33,62,.08);vertical-align:middle;}
+  .sched-table tr:last-child td{border-bottom:none;}
+  .sched-table td.no-cell{color:var(--ink-soft);font-size:13px;width:30px;}
+  .sched-table td.day-cell{font-weight:700;white-space:nowrap;}
+  .sched-table td.time{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:16px;white-space:nowrap;}
+  .sched-table td.notes-cell{color:var(--ink-soft);font-size:14px;}
+  @media (max-width:560px){
+    .sched-table thead{display:none;}
+    .sched-table, .sched-table tbody, .sched-table tr, .sched-table td{display:block;width:100%;}
+    .sched-table{border-collapse:separate;}
+    .sched-table tr{padding:12px 14px;border-bottom:1px solid rgba(22,33,62,.1);}
+    .sched-table td{border:none;padding:2px 0;}
+    .sched-table td.no-cell{display:none;}
+    .sched-table td.day-cell{font-size:16px;margin-bottom:4px;}
+    .sched-table td::before{content:attr(data-label);display:inline-block;min-width:64px;font-size:11px;
+      text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);font-weight:700;margin-inline-end:8px;}
+    .sched-table td.day-cell::before{content:none;}
+  }
+  .footlinks{margin-top:24px;text-align:center;font-size:13px;color:var(--ink-soft);}
+  #detailView{display:none;}
+</style>
+</head>
+<body>
+
+<div id="splash" class="splash">
+  <div>
+    <div class="splash-eyebrow" data-i18n="uni">University of Raparin</div>
+    <div class="splash-rule"></div>
+    <h1 class="splash-title" data-i18n="splashTitle">Welcome</h1>
+    <p class="splash-sub" data-i18n="splashSub">Loading teacher availability…</p>
+    <div class="splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<div id="banner"></div>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <span class="eyebrow" data-i18n="uni">University of Raparin</span>
+      <h1 data-i18n="appTitle">Find Your Teacher</h1>
+    </div>
+    <button id="langToggle" type="button">English</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- LIST -->
+  <section id="listView">
+    <div class="controls">
+      <div class="search-wrap">
+        <input id="searchInput" type="text" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" data-i18n-ph="searchPlaceholder" placeholder="Search by name…">
+        <ul id="searchDropdown" class="dropdown" role="listbox" hidden></ul>
+      </div>
+      <select id="deptFilter"></select>
+      <label class="toggle-chip" id="availToggleLabel">
+        <input type="checkbox" id="availToggle">
+        <span class="dot"></span>
+        <span data-i18n="availableNowFilter">Available now</span>
+      </label>
+    </div>
+    <div class="card" id="listCard"></div>
+  </section>
+
+  <!-- DETAIL -->
+  <section id="detailView">
+    <button class="back-btn" id="backBtn">← <span data-i18n="back">Back to list</span></button>
+    <div class="card">
+      <div class="detail-head">
+        <div class="avatar avatar-lg" id="dAvatar"></div>
+        <div class="name-block">
+          <h2 id="dName">—</h2>
+          <div class="dept" id="dMeta">—</div>
+        </div>
+        <span class="badge badge-on" id="dBadge" style="display:none"><span class="dot" style="background:var(--forest)"></span><span data-i18n="inOfficeNow">In office now</span></span>
+      </div>
+
+      <div id="dNotices"></div>
+
+      <div class="contact-row" id="dContact"></div>
+
+      <h3 style="margin-top:26px" data-i18n="scheduleTitle">Weekly schedule</h3>
+      <div id="dSchedule"></div>
+    </div>
+    <p class="footlinks" data-i18n="shareHint">Tip: this page's link is shareable — bookmark it or send it directly.</p>
+  </section>
+
+  <p class="footlinks" id="teacherLinkFoot"><a href="index.html" data-i18n="teacherLink">Are you a teacher? Log in here →</a></p>
+
+</div>
+
+<script>
+const GAS_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+const splashStart = Date.now();
+
+const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const DAY_LABEL = {
+  en: {Sunday:'Sunday',Monday:'Monday',Tuesday:'Tuesday',Wednesday:'Wednesday',Thursday:'Thursday',Friday:'Friday',Saturday:'Saturday'},
+  ku: {Sunday:'یەکشەمە',Monday:'دووشەمە',Tuesday:'سێشەمە',Wednesday:'چوارشەمە',Thursday:'پێنجشەمە',Friday:'هەینی',Saturday:'شەممە'}
+};
+
+const T = {
+  en: {
+    uni:'University of Raparin', appTitle:'Find Your Teacher',
+    splashTitle:'Welcome to the English Language Department', splashSub:'Please wait while we get things ready…',
+    searchPlaceholder:'Search by name…', deptAll:'All departments',
+    availableNowFilter:'Available now', noResults:'No teachers match your search.',
+    back:'Back to list', inOfficeNow:'In office now', scheduleTitle:'Weekly schedule',
+    noSchedule:'No published schedule yet.', shareHint:"Tip: this page's link is shareable — bookmark it or send it directly.",
+    teacherLink:'Are you a teacher? Log in here →', configWarn:'Set GAS_URL near the top of this file before using the app.',
+    genericErr:'Could not load the directory. Check your connection and reload.', email:'Email', call:'Call', office:'Office',
+    colNo:'No.', colDay:'Day', colTime:'Time', colHall:'Hall', colNotes:'Notes'
+  },
+  ku: {
+    uni:'زانکۆی ڕاپەرین', appTitle:'مامۆستاکەت بدۆزەرەوە',
+    splashTitle:'بەخێربێیت بۆ بەشی زمانی ئینگلیزی', splashSub:'تکایە چاوەڕێ بکە تا کاتەکانی مامۆستایان ئامادە دەبن…',
+    searchPlaceholder:'گەڕان بە ناو…', deptAll:'هەموو بەشەکان',
+    availableNowFilter:'ئێستا ئامادەیە', noResults:'هیچ مامۆستایەک لەگەڵ گەڕانەکەت ناگونجێت.',
+    back:'گەڕانەوە بۆ لیستە', inOfficeNow:'ئێستا لە ژوورە', scheduleTitle:'خشتەی هەفتانە',
+    noSchedule:'هێشتا خشتەیەک بڵاو نەکراوەتەوە.', shareHint:'ئامۆژگاری: لینکی ئەم پەڕەیە دابەشکراوە — دەتوانیت هەڵیبگریت یان ڕاستەوخۆ بینێریت.',
+    teacherLink:'مامۆستایت؟ لێرە بچۆرەژوورەوە ←', configWarn:'پێش بەکارهێنانی ئەپەکە، GAS_URL لە سەرەوەی ئەم فایلە دابنێ.',
+    genericErr:'ناتوانرێت لیستەکە باربکرێت. پەیوەندی ئینتەرنێتەکەت بپشکنە و پەڕەکە نوێ بکەرەوە.', email:'ئیمەیل', call:'پەیوەندی', office:'ژووری کار',
+    colNo:'ژمارە', colDay:'ڕۆژ', colTime:'کات', colHall:'هۆڵ', colNotes:'تێبینی'
+  }
+};
+
+let lang = 'ku';
+let allTeachers = [];
+let currentId = null;
+
+function tr(key){ return T[lang][key] || key; }
+
+function applyLang(){
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ku' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = tr(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){ el.placeholder = tr(el.dataset.i18nPh); });
+  document.getElementById('langToggle').textContent = lang === 'ku' ? 'English' : 'کوردی';
+  renderDeptOptions();
+  if (typeof renderDropdown === 'function') renderDropdown();
+  if (currentId){ renderDetail(currentId); } else { applyFilters(); }
+}
+
+document.getElementById('langToggle').addEventListener('click', function(){
+  lang = lang === 'ku' ? 'en' : 'ku';
+  applyLang();
+});
+
+function isAvailableNow(slots){
+  const now = new Date();
+  const day = DAYS[now.getDay()];
+  const hm = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+  return (slots || []).some(function(s){ return s.day === day && hm >= s.start && hm < s.end; });
+}
+
+/* ---------- PER-TEACHER COLOR ---------- */
+
+const AVATAR_COLORS = ['#3B5BA5','#7A4FA3','#1C7A72','#A6631B','#5B6B3F','#8A4A63'];
+
+function colorFor(id){
+  let h = 0;
+  const s = String(id);
+  for (let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+function initialsFor(t){
+  const n = (nameOf(t) || '').trim();
+  if (!n) return '?';
+  if (/[A-Za-z]/.test(n[0])){
+    const parts = n.split(/\s+/);
+    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  }
+  return n.slice(0, 1);
+}
+
+/* ---------- LOAD ---------- */
+
+async function loadTeachers(){
+  const res = await fetch(GAS_URL + '?action=getTeachers');
+  allTeachers = await res.json();
+}
+
+/* ---------- LIST VIEW ---------- */
+
+function renderDeptOptions(){
+  const sel = document.getElementById('deptFilter');
+  const depts = Array.from(new Set(allTeachers.map(function(t){ return t.department; }).filter(Boolean)));
+  const current = sel.value;
+  sel.innerHTML = '';
+  const allOpt = document.createElement('option');
+  allOpt.value = ''; allOpt.textContent = tr('deptAll');
+  sel.appendChild(allOpt);
+  depts.forEach(function(d){
+    const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o);
+  });
+  sel.value = depts.indexOf(current) !== -1 ? current : '';
+}
+
+function applyFilters(){
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  const dept = document.getElementById('deptFilter').value;
+  const onlyAvail = document.getElementById('availToggle').checked;
+  const filtered = allTeachers.filter(function(t){
+    const name = (lang==='ku' ? (t.nameKu||t.nameEn) : (t.nameEn||t.nameKu) || '').toLowerCase();
+    const matchesQ = !q || name.indexOf(q) !== -1 || (t.nameEn||'').toLowerCase().indexOf(q)!==-1 || (t.nameKu||'').toLowerCase().indexOf(q)!==-1;
+    const matchesDept = !dept || t.department === dept;
+    const matchesAvail = !onlyAvail || isAvailableNow(t.slots);
+    return matchesQ && matchesDept && matchesAvail;
+  });
+  renderList(filtered);
+}
+
+function renderList(list){
+  const card = document.getElementById('listCard');
+  card.innerHTML = '';
+  if (!list.length){
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = tr('noResults');
+    card.appendChild(p);
+    return;
+  }
+  list.forEach(function(t){
+    const row = document.createElement('div');
+    row.className = 'list-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.style.background = colorFor(t.id);
+    avatar.textContent = initialsFor(t);
+    row.appendChild(avatar);
+    const left = document.createElement('div');
+    left.className = 'row-text';
+    const name = document.createElement('div'); name.className = 'name';
+    name.textContent = (lang==='ku' ? (t.nameKu||t.nameEn) : (t.nameEn||t.nameKu));
+    const meta = document.createElement('div'); meta.className = 'meta';
+    meta.textContent = [t.department, t.office].filter(Boolean).join(' · ');
+    left.appendChild(name); left.appendChild(meta);
+    row.appendChild(left);
+    if (isAvailableNow(t.slots)){
+      const badge = document.createElement('span');
+      badge.className = 'badge badge-on';
+      badge.innerHTML = '<span class="dot"></span>' + tr('inOfficeNow');
+      row.appendChild(badge);
+    }
+    row.addEventListener('click', function(){ openDetail(t.id); });
+    card.appendChild(row);
+  });
+}
+
+/* ---------- SEARCH AUTOCOMPLETE ---------- */
+
+let ddMatches = [];
+let ddActive = -1;
+
+function nameOf(t){ return lang === 'ku' ? (t.nameKu || t.nameEn) : (t.nameEn || t.nameKu); }
+
+function computeMatches(q){
+  q = q.trim().toLowerCase();
+  if (!q) return [];
+  return allTeachers.filter(function(t){
+    return (t.nameEn || '').toLowerCase().indexOf(q) !== -1 || (t.nameKu || '').toLowerCase().indexOf(q) !== -1;
+  }).slice(0, 8);
+}
+
+function renderDropdown(){
+  const dd = document.getElementById('searchDropdown');
+  const input = document.getElementById('searchInput');
+  dd.innerHTML = '';
+  if (!ddMatches.length){
+    dd.hidden = true;
+    input.setAttribute('aria-expanded', 'false');
+    return;
+  }
+  ddMatches.forEach(function(t, i){
+    const li = document.createElement('li');
+    li.setAttribute('role', 'option');
+    if (i === ddActive) li.classList.add('active');
+    const nm = document.createElement('div'); nm.className = 'dname'; nm.textContent = nameOf(t);
+    const mt = document.createElement('div'); mt.className = 'dmeta';
+    mt.textContent = [t.department, t.office].filter(Boolean).join(' · ');
+    li.appendChild(nm); li.appendChild(mt);
+    li.addEventListener('mousedown', function(e){ e.preventDefault(); selectTeacher(t.id); });
+    dd.appendChild(li);
+  });
+  dd.hidden = false;
+  input.setAttribute('aria-expanded', 'true');
+}
+
+function selectTeacher(id){
+  document.getElementById('searchDropdown').hidden = true;
+  document.getElementById('searchInput').value = '';
+  ddMatches = []; ddActive = -1;
+  applyFilters();
+  openDetail(id);
+}
+
+document.getElementById('searchInput').addEventListener('input', function(){
+  ddMatches = computeMatches(this.value);
+  ddActive = -1;
+  renderDropdown();
+  applyFilters();
+});
+
+document.getElementById('searchInput').addEventListener('keydown', function(e){
+  if (document.getElementById('searchDropdown').hidden) return;
+  if (e.key === 'ArrowDown'){ e.preventDefault(); ddActive = Math.min(ddActive + 1, ddMatches.length - 1); renderDropdown(); }
+  else if (e.key === 'ArrowUp'){ e.preventDefault(); ddActive = Math.max(ddActive - 1, 0); renderDropdown(); }
+  else if (e.key === 'Enter'){
+    if (ddActive >= 0 && ddMatches[ddActive]){ e.preventDefault(); selectTeacher(ddMatches[ddActive].id); }
+    else if (ddMatches.length === 1){ e.preventDefault(); selectTeacher(ddMatches[0].id); }
+  } else if (e.key === 'Escape'){
+    document.getElementById('searchDropdown').hidden = true;
+  }
+});
+
+document.getElementById('searchInput').addEventListener('focus', function(){
+  if (ddMatches.length) renderDropdown();
+});
+
+document.getElementById('searchInput').addEventListener('blur', function(){
+  setTimeout(function(){ document.getElementById('searchDropdown').hidden = true; }, 150);
+});
+
+document.getElementById('deptFilter').addEventListener('change', applyFilters);
+document.getElementById('availToggle').addEventListener('change', function(){
+  document.getElementById('availToggleLabel').classList.toggle('on', this.checked);
+  applyFilters();
+});
+
+/* ---------- DETAIL VIEW ---------- */
+
+function openDetail(id){
+  currentId = id;
+  history.pushState({}, '', '?teacher=' + encodeURIComponent(id));
+  renderDetail(id);
+  showView('detail');
+}
+
+function renderDetail(id){
+  const t = allTeachers.find(function(x){ return x.id === id; });
+  if (!t){ showList(); return; }
+
+  document.getElementById('dName').textContent = (lang==='ku' ? (t.nameKu||t.nameEn) : (t.nameEn||t.nameKu));
+  document.getElementById('dMeta').textContent = [t.department, t.office].filter(Boolean).join(' · ');
+  document.getElementById('dBadge').style.display = isAvailableNow(t.slots) ? 'inline-flex' : 'none';
+  const av = document.getElementById('dAvatar');
+  av.style.background = colorFor(t.id);
+  av.textContent = initialsFor(t);
+
+  const notices = document.getElementById('dNotices');
+  notices.innerHTML = '';
+  (t.notices||[]).forEach(function(n){
+    const b = document.createElement('div');
+    b.className = 'notice-banner';
+    b.textContent = n.message;
+    notices.appendChild(b);
+  });
+
+  // Defensive: Sheets can occasionally hand back a phone/email/office as a
+  // Number rather than a String — always coerce before calling string methods.
+  const email = t.email != null ? String(t.email) : '';
+  const phone = t.phone != null ? String(t.phone) : '';
+  const office = t.office != null ? String(t.office) : '';
+
+  const contact = document.getElementById('dContact');
+  contact.innerHTML = '';
+  if (email){
+    const a = document.createElement('a'); a.href = 'mailto:' + email; a.textContent = tr('email') + ': ' + email;
+    contact.appendChild(a);
+  }
+  if (phone){
+    const a = document.createElement('a'); a.href = 'tel:' + phone.replace(/\s+/g,''); a.textContent = tr('call') + ': ' + phone;
+    contact.appendChild(a);
+  }
+  if (office){
+    const s = document.createElement('span'); s.textContent = tr('office') + ': ' + office;
+    contact.appendChild(s);
+  }
+
+  renderScheduleTable(t.slots || []);
+}
+
+const DAY_COLORS = {
+  Sunday:'#FBEDD9', Monday:'#E4ECF7', Tuesday:'#EAE1F2', Wednesday:'#DCEEEA',
+  Thursday:'#F1E6D3', Friday:'#E7EAD9', Saturday:'#F1E0E6'
+};
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderScheduleTable(slots){
+  const sched = document.getElementById('dSchedule');
+  sched.innerHTML = '';
+  const sorted = slots.slice().sort(function(a,b){
+    const da = DAYS.indexOf(a.day), db = DAYS.indexOf(b.day);
+    if (da !== db) return da - db;
+    return String(a.start).localeCompare(String(b.start));
+  });
+  if (!sorted.length){
+    const p = document.createElement('p');
+    p.className = 'empty';
+    p.textContent = tr('noSchedule');
+    sched.appendChild(p);
+    return;
+  }
+  const rowsHtml = sorted.map(function(s, i){
+    const loc = s.location ? esc(s.location) : '—';
+    const note = s.note ? esc(s.note) : '—';
+    return '<tr style="background:' + (DAY_COLORS[s.day] || '#fff') + '">' +
+      '<td class="no-cell" data-label="'+esc(tr('colNo'))+'">' + (i + 1) + '</td>' +
+      '<td class="day-cell" data-label="'+esc(tr('colDay'))+'">' + esc(DAY_LABEL[lang][s.day]) + '</td>' +
+      '<td class="time" data-label="'+esc(tr('colTime'))+'">' + esc(s.start) + '–' + esc(s.end) + '</td>' +
+      '<td data-label="'+esc(tr('colHall'))+'">' + loc + '</td>' +
+      '<td class="notes-cell" data-label="'+esc(tr('colNotes'))+'">' + note + '</td>' +
+    '</tr>';
+  }).join('');
+  sched.innerHTML =
+    '<div class="table-wrap"><table class="sched-table">' +
+      '<thead><tr><th>'+esc(tr('colNo'))+'</th><th>'+esc(tr('colDay'))+'</th><th>'+esc(tr('colTime'))+'</th><th>'+esc(tr('colHall'))+'</th><th>'+esc(tr('colNotes'))+'</th></tr></thead>' +
+      '<tbody>' + rowsHtml + '</tbody>' +
+    '</table></div>';
+}
+
+document.getElementById('backBtn').addEventListener('click', function(){ showList(); history.pushState({}, '', location.pathname); });
+
+function showView(which){
+  document.getElementById('listView').style.display = which === 'list' ? 'block' : 'none';
+  document.getElementById('detailView').style.display = which === 'detail' ? 'block' : 'none';
+  document.getElementById('teacherLinkFoot').style.display = which === 'list' ? 'block' : 'none';
+}
+
+function showList(){ currentId = null; showView('list'); }
+
+window.addEventListener('popstate', function(){
+  const id = new URLSearchParams(location.search).get('teacher');
+  if (id){ currentId = id; renderDetail(id); showView('detail'); }
+  else { showList(); }
+});
+
+/* ---------- INIT ---------- */
+
+const LS_CACHE_KEY = 'ta_teachers_cache_v1';
+
+function loadCachedTeachers(){
+  try{
+    const raw = localStorage.getItem(LS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return (parsed && parsed.data && parsed.data.length) ? parsed.data : null;
+  } catch(e){ return null; }
+}
+function saveCachedTeachers(data){
+  try{ localStorage.setItem(LS_CACHE_KEY, JSON.stringify({ data: data, ts: Date.now() })); } catch(e){ /* storage unavailable */ }
+}
+
+function hideSplashWhenReady(minMs){
+  const elapsed = Date.now() - splashStart;
+  const wait = Math.max(0, (minMs || 400) - elapsed);
+  setTimeout(function(){
+    const s = document.getElementById('splash');
+    if (s) s.classList.add('hide');
+  }, wait);
+}
+
+function finishInit(){
+  applyLang();
+  const qId = new URLSearchParams(location.search).get('teacher');
+  if (qId){ currentId = qId; renderDetail(qId); showView('detail'); } else { showView('list'); }
+}
+
+async function init(){
+  if (GAS_URL.indexOf('PASTE_YOUR_WEB_APP_URL_HERE') !== -1){
+    const b = document.getElementById('banner');
+    b.textContent = T.en.configWarn + ' / ' + T.ku.configWarn;
+    b.style.display = 'block';
+    hideSplashWhenReady(300);
+    return;
+  }
+
+  const cached = loadCachedTeachers();
+  if (cached){
+    // Show cached results instantly, then quietly refresh from the server.
+    allTeachers = cached;
+    finishInit();
+    hideSplashWhenReady(300);
+    loadTeachers().then(function(){
+      saveCachedTeachers(allTeachers);
+      renderDeptOptions();
+      if (currentId){ renderDetail(currentId); } else { applyFilters(); }
+    }).catch(function(){ /* keep showing cached data if the refresh fails */ });
+    return;
+  }
+
+  try{
+    await loadTeachers();
+    saveCachedTeachers(allTeachers);
+  } catch(e){
+    document.getElementById('listCard').innerHTML = '<div class="empty">' + T.en.genericErr + '<br>' + T.ku.genericErr + '</div>';
+  }
+  finishInit();
+  hideSplashWhenReady(400);
+}
+
+init();
+</script>
+</body>
+</html>
