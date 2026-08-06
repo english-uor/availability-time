@@ -30,6 +30,26 @@
   #langToggle:hover{border-color:var(--gold);color:var(--gold);}
   #banner{display:none;background:var(--rust-soft);color:var(--rust);font-size:13px;padding:10px 16px;text-align:center;font-weight:600;}
 
+  .splash{position:fixed;inset:0;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;
+    z-index:1000;transition:opacity .45s ease, visibility .45s ease;padding:20px;text-align:center;}
+  .splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
+  .splash-eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft);margin-bottom:16px;font-weight:600;}
+  .splash-title{font-family:'Fraunces',serif;font-size:36px;margin:0 0 10px;color:#fff;}
+  html[dir="rtl"] .splash-title{font-family:'Vazirmatn',serif;}
+  .splash-sub{font-size:14px;color:#C9D0E0;margin:2px 0;}
+  .splash-sub.muted{font-size:12.5px;color:#8B96B8;}
+  .splash-dots{margin-top:24px;display:flex;gap:8px;justify-content:center;}
+  .splash-dots span{width:8px;height:8px;border-radius:50%;background:var(--gold);animation:splashPulse 1.1s ease-in-out infinite;}
+  .splash-dots span:nth-child(2){animation-delay:.15s;}
+  .splash-dots span:nth-child(3){animation-delay:.3s;}
+  @keyframes splashPulse{0%,80%,100%{opacity:.25;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+  @media (prefers-reduced-motion: reduce){.splash-dots span{animation:none;opacity:.7;}}
+
+  .avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:15px;flex-shrink:0;font-family:'Fraunces',serif;}
+  html[dir="rtl"] .avatar{font-family:'Vazirmatn',serif;}
+  .avatar-lg{width:58px;height:58px;font-size:21px;}
+
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-top:20px;}
   .controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;}
   .controls input[type=text],.controls select{
@@ -51,9 +71,10 @@
   .toggle-chip input{display:none;}
 
   #listView .card{padding:0;overflow:hidden;}
-  .list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .list-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--line);cursor:pointer;}
   .list-row:last-child{border-bottom:none;}
   .list-row:hover{background:var(--paper);}
+  .list-row .row-text{flex:1;min-width:0;}
   .list-row .name{font-weight:600;font-size:15px;}
   .list-row .meta{font-size:13px;color:var(--ink-soft);margin-top:2px;}
   .badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 10px;border-radius:999px;flex-shrink:0;}
@@ -63,24 +84,34 @@
 
   .back-btn{border:none;background:transparent;color:var(--ink-soft);font-size:14px;font-weight:600;cursor:pointer;padding:0;margin-bottom:14px;display:inline-flex;align-items:center;gap:6px;}
   .back-btn:hover{color:var(--gold);}
-  .detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .detail-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .detail-head .name-block{flex:1;min-width:160px;}
   .detail-head .dept{color:var(--ink-soft);font-size:14px;margin-top:2px;}
   .notice-banner{background:var(--rust-soft);color:var(--rust);border-radius:8px;padding:12px 14px;margin-top:16px;font-size:14px;}
   .notice-banner + .notice-banner{margin-top:8px;}
   .contact-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
   .contact-row a,.contact-row span{font-size:14px;border:1px solid var(--line);border-radius:8px;padding:9px 14px;color:var(--ink);text-decoration:none;background:#fff;}
   .contact-row a:hover{border-color:var(--gold);color:var(--gold);}
-  .day-block{border-top:1px solid var(--line);padding:14px 0;}
+  .day-block{border-top:1px solid var(--line);padding:16px 0;}
   .day-block:first-of-type{border-top:none;}
-  .day-name{font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:8px;}
-  .slots{display:flex;flex-wrap:wrap;gap:8px;}
-  .chip{background:var(--gold-soft);border-radius:999px;padding:7px 14px;font-size:13px;}
-  .chip .loc{color:var(--ink-soft);margin-inline-start:6px;}
+  .day-name{font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px;}
+  .slots{display:flex;flex-wrap:wrap;gap:10px;}
+  .chip{background:var(--gold-soft);border-radius:12px;padding:11px 16px;font-size:17px;font-weight:600;}
+  .chip .loc{color:var(--ink-soft);margin-inline-start:8px;font-size:14px;font-weight:500;}
   .footlinks{margin-top:24px;text-align:center;font-size:13px;color:var(--ink-soft);}
   #detailView{display:none;}
 </style>
 </head>
 <body>
+
+<div id="splash" class="splash">
+  <div>
+    <div class="splash-eyebrow" data-i18n="uni">University of Raparin</div>
+    <h1 class="splash-title" data-i18n="splashTitle">Welcome</h1>
+    <p class="splash-sub" data-i18n="splashSub">Loading teacher availability…</p>
+    <div class="splash-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+  </div>
+</div>
 
 <div id="banner"></div>
 
@@ -118,7 +149,8 @@
     <button class="back-btn" id="backBtn">← <span data-i18n="back">Back to list</span></button>
     <div class="card">
       <div class="detail-head">
-        <div>
+        <div class="avatar avatar-lg" id="dAvatar"></div>
+        <div class="name-block">
           <h2 id="dName">—</h2>
           <div class="dept" id="dMeta">—</div>
         </div>
@@ -140,7 +172,8 @@
 </div>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwJJEoF3Tqu5Xae5ISy48Jc5gDmu4wBlmo5Jm4QakCjwtIm0adJ-tQmUd5nAnKjyGrd-Q/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbxuOuXa2uapR_l0SqWdxJDBNHWagr55pe17uy4G-RgHz3WUOeYLbFsxYtlUUAf3U680Mw/exec';
+const splashStart = Date.now();
 
 const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const DAY_LABEL = {
@@ -151,6 +184,7 @@ const DAY_LABEL = {
 const T = {
   en: {
     uni:'University of Raparin', appTitle:'Find Your Teacher',
+    splashTitle:'Welcome', splashSub:'Loading teacher availability…',
     searchPlaceholder:'Search by name…', deptAll:'All departments',
     availableNowFilter:'Available now', noResults:'No teachers match your search.',
     back:'Back to list', inOfficeNow:'In office now', scheduleTitle:'Weekly schedule',
@@ -160,6 +194,7 @@ const T = {
   },
   ku: {
     uni:'زانکۆی ڕاپەرین', appTitle:'مامۆستاکەت بدۆزەرەوە',
+    splashTitle:'بەخێربێیت', splashSub:'کاتی مامۆستاکان بار دەکرێت…',
     searchPlaceholder:'گەڕان بە ناو…', deptAll:'هەموو بەشەکان',
     availableNowFilter:'ئێستا ئامادەیە', noResults:'هیچ مامۆستایەک لەگەڵ گەڕانەکەت ناگونجێت.',
     back:'گەڕانەوە بۆ لیستە', inOfficeNow:'ئێستا لە ژوورە', scheduleTitle:'خشتەی هەفتانە',
@@ -196,6 +231,27 @@ function isAvailableNow(slots){
   const day = DAYS[now.getDay()];
   const hm = String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
   return (slots || []).some(function(s){ return s.day === day && hm >= s.start && hm < s.end; });
+}
+
+/* ---------- PER-TEACHER COLOR ---------- */
+
+const AVATAR_COLORS = ['#3B5BA5','#7A4FA3','#1C7A72','#A6631B','#5B6B3F','#8A4A63'];
+
+function colorFor(id){
+  let h = 0;
+  const s = String(id);
+  for (let i = 0; i < s.length; i++){ h = (h * 31 + s.charCodeAt(i)) >>> 0; }
+  return AVATAR_COLORS[h % AVATAR_COLORS.length];
+}
+
+function initialsFor(t){
+  const n = (nameOf(t) || '').trim();
+  if (!n) return '?';
+  if (/[A-Za-z]/.test(n[0])){
+    const parts = n.split(/\s+/);
+    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  }
+  return n.slice(0, 1);
 }
 
 /* ---------- LOAD ---------- */
@@ -248,7 +304,13 @@ function renderList(list){
   list.forEach(function(t){
     const row = document.createElement('div');
     row.className = 'list-row';
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.style.background = colorFor(t.id);
+    avatar.textContent = initialsFor(t);
+    row.appendChild(avatar);
     const left = document.createElement('div');
+    left.className = 'row-text';
     const name = document.createElement('div'); name.className = 'name';
     name.textContent = (lang==='ku' ? (t.nameKu||t.nameEn) : (t.nameEn||t.nameKu));
     const meta = document.createElement('div'); meta.className = 'meta';
@@ -362,6 +424,9 @@ function renderDetail(id){
   document.getElementById('dName').textContent = (lang==='ku' ? (t.nameKu||t.nameEn) : (t.nameEn||t.nameKu));
   document.getElementById('dMeta').textContent = [t.department, t.office].filter(Boolean).join(' · ');
   document.getElementById('dBadge').style.display = isAvailableNow(t.slots) ? 'inline-flex' : 'none';
+  const av = document.getElementById('dAvatar');
+  av.style.background = colorFor(t.id);
+  av.textContent = initialsFor(t);
 
   const notices = document.getElementById('dNotices');
   notices.innerHTML = '';
@@ -431,20 +496,66 @@ window.addEventListener('popstate', function(){
 
 /* ---------- INIT ---------- */
 
+const LS_CACHE_KEY = 'ta_teachers_cache_v1';
+
+function loadCachedTeachers(){
+  try{
+    const raw = localStorage.getItem(LS_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return (parsed && parsed.data && parsed.data.length) ? parsed.data : null;
+  } catch(e){ return null; }
+}
+function saveCachedTeachers(data){
+  try{ localStorage.setItem(LS_CACHE_KEY, JSON.stringify({ data: data, ts: Date.now() })); } catch(e){ /* storage unavailable */ }
+}
+
+function hideSplashWhenReady(minMs){
+  const elapsed = Date.now() - splashStart;
+  const wait = Math.max(0, (minMs || 400) - elapsed);
+  setTimeout(function(){
+    const s = document.getElementById('splash');
+    if (s) s.classList.add('hide');
+  }, wait);
+}
+
+function finishInit(){
+  applyLang();
+  const qId = new URLSearchParams(location.search).get('teacher');
+  if (qId){ currentId = qId; renderDetail(qId); showView('detail'); } else { showView('list'); }
+}
+
 async function init(){
   if (GAS_URL.indexOf('PASTE_YOUR_WEB_APP_URL_HERE') !== -1){
     const b = document.getElementById('banner');
     b.textContent = T.en.configWarn + ' / ' + T.ku.configWarn;
     b.style.display = 'block';
+    hideSplashWhenReady(300);
+    return;
   }
+
+  const cached = loadCachedTeachers();
+  if (cached){
+    // Show cached results instantly, then quietly refresh from the server.
+    allTeachers = cached;
+    finishInit();
+    hideSplashWhenReady(300);
+    loadTeachers().then(function(){
+      saveCachedTeachers(allTeachers);
+      renderDeptOptions();
+      if (currentId){ renderDetail(currentId); } else { applyFilters(); }
+    }).catch(function(){ /* keep showing cached data if the refresh fails */ });
+    return;
+  }
+
   try{
     await loadTeachers();
+    saveCachedTeachers(allTeachers);
   } catch(e){
     document.getElementById('listCard').innerHTML = '<div class="empty">' + T.en.genericErr + '<br>' + T.ku.genericErr + '</div>';
   }
-  applyLang();
-  const qId = new URLSearchParams(location.search).get('teacher');
-  if (qId){ currentId = qId; renderDetail(qId); showView('detail'); } else { showView('list'); }
+  finishInit();
+  hideSplashWhenReady(400);
 }
 
 init();
